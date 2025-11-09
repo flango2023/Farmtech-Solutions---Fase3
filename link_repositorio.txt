@@ -1,5 +1,5 @@
 FarmTech Solutions - Fase 3: Banco de Dados Oracle
-Repositório GitHub: https://github.com/richardschmitz/farmtech-solutions-fase3
+Repositório GitHub: https://github.com/flango2023/Farmtech-Solutions---Fase3
 
 Estrutura do Repositório:
 farmtech-solutions-fase3/
