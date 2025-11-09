@@ -1,0 +1,25 @@
+FarmTech Solutions - Fase 3: Banco de Dados Oracle
+Repositório GitHub: https://github.com/richardschmitz/farmtech-solutions-fase3
+
+Estrutura do Repositório:
+farmtech-solutions-fase3/
+├── README.md
+├── database/
+│   ├── dados_sensores_limpos.csv
+│   └── consultas_sql.sql
+├── screenshots/
+│   ├── 01_conexao_oracle.png
+│   ├── 02_importacao_dados.png
+│   ├── 03_tabela_criada.png
+│   ├── 04_consulta_geral.png
+│   └── 05_analises_sql.png
+├── scripts/
+│   └── preparacao_dados.py
+├── docs/
+│   └── relatorio_fase3.md
+├── .gitignore
+└── link_repositorio.txt
+
+Desenvolvedor: Richard Schmitz - RM567951
+Curso: Inteligência Artificial - FIAP
+Data: Janeiro 2025

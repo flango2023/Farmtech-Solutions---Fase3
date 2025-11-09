@@ -1,0 +1,143 @@
+-- FarmTech Solutions - Fase 3: Consultas SQL Oracle
+-- Desenvolvedor: Richard Schmitz - RM567951
+-- Data: Janeiro 2025
+
+-- ========================================
+-- 1. CONSULTA GERAL - Visualizar todos os dados
+-- ========================================
+SELECT * FROM SENSORES_SOJA_RM567951
+ORDER BY TIMESTAMP;
+
+-- ========================================
+-- 2. ESTATÍSTICAS GERAIS DO SISTEMA
+-- ========================================
+SELECT 
+    COUNT(*) as TOTAL_REGISTROS,
+    SUM(IRRIGACAO_ATIVA) as VEZES_IRRIGADO,
+    ROUND(AVG(UMIDADE_SOLO), 2) as UMIDADE_MEDIA,
+    ROUND(MIN(UMIDADE_SOLO), 2) as UMIDADE_MINIMA,
+    ROUND(MAX(UMIDADE_SOLO), 2) as UMIDADE_MAXIMA,
+    ROUND(AVG(PH_SOLO), 2) as PH_MEDIO,
+    ROUND(AVG(TEMPERATURA), 2) as TEMP_MEDIA
+FROM SENSORES_SOJA_RM567951;
+
+-- ========================================
+-- 3. ANÁLISE DE CONDIÇÕES CRÍTICAS
+-- ========================================
+-- Situações onde irrigação foi necessária (umidade baixa)
+SELECT 
+    TIMESTAMP,
+    UMIDADE_SOLO,
+    PH_SOLO,
+    TEMPERATURA,
+    IRRIGACAO_ATIVA
+FROM SENSORES_SOJA_RM567951 
+WHERE UMIDADE_SOLO < 50 
+AND IRRIGACAO_ATIVA = 1
+ORDER BY UMIDADE_SOLO ASC;
+
+-- ========================================
+-- 4. ANÁLISE DE NUTRIENTES NPK
+-- ========================================
+SELECT 
+    (NITROGENIO + FOSFORO + POTASSIO) as NUTRIENTES_DISPONIVEIS,
+    COUNT(*) as OCORRENCIAS,
+    ROUND(AVG(UMIDADE_SOLO), 2) as UMIDADE_MEDIA,
+    ROUND(AVG(PH_SOLO), 2) as PH_MEDIO
+FROM SENSORES_SOJA_RM567951
+GROUP BY (NITROGENIO + FOSFORO + POTASSIO)
+ORDER BY NUTRIENTES_DISPONIVEIS DESC;
+
+-- ========================================
+-- 5. CORRELAÇÃO CHUVA vs IRRIGAÇÃO
+-- ========================================
+SELECT 
+    CASE 
+        WHEN CHUVA_MM > 0 THEN 'Com Chuva'
+        ELSE 'Sem Chuva'
+    END as CONDICAO_CHUVA,
+    COUNT(*) as REGISTROS,
+    SUM(IRRIGACAO_ATIVA) as IRRIGACOES_REALIZADAS,
+    ROUND(AVG(UMIDADE_SOLO), 2) as UMIDADE_MEDIA,
+    ROUND(SUM(CHUVA_MM), 2) as TOTAL_CHUVA_MM
+FROM SENSORES_SOJA_RM567951
+GROUP BY CASE WHEN CHUVA_MM > 0 THEN 'Com Chuva' ELSE 'Sem Chuva' END;
+
+-- ========================================
+-- 6. ANÁLISE POR PERÍODO DO DIA
+-- ========================================
+SELECT 
+    CASE 
+        WHEN EXTRACT(HOUR FROM TIMESTAMP) BETWEEN 6 AND 11 THEN 'Manhã'
+        WHEN EXTRACT(HOUR FROM TIMESTAMP) BETWEEN 12 AND 17 THEN 'Tarde'
+        ELSE 'Noite'
+    END as PERIODO_DIA,
+    COUNT(*) as REGISTROS,
+    ROUND(AVG(UMIDADE_SOLO), 2) as UMIDADE_MEDIA,
+    ROUND(AVG(TEMPERATURA), 2) as TEMP_MEDIA,
+    SUM(IRRIGACAO_ATIVA) as IRRIGACOES
+FROM SENSORES_SOJA_RM567951
+GROUP BY CASE 
+    WHEN EXTRACT(HOUR FROM TIMESTAMP) BETWEEN 6 AND 11 THEN 'Manhã'
+    WHEN EXTRACT(HOUR FROM TIMESTAMP) BETWEEN 12 AND 17 THEN 'Tarde'
+    ELSE 'Noite'
+END
+ORDER BY PERIODO_DIA;
+
+-- ========================================
+-- 7. CONDIÇÕES IDEAIS PARA SOJA
+-- ========================================
+-- Verificar registros dentro dos parâmetros ideais
+SELECT 
+    TIMESTAMP,
+    UMIDADE_SOLO,
+    PH_SOLO,
+    NITROGENIO,
+    FOSFORO,
+    POTASSIO,
+    TEMPERATURA,
+    CASE 
+        WHEN UMIDADE_SOLO BETWEEN 60 AND 80 
+        AND PH_SOLO BETWEEN 6.0 AND 6.8
+        AND (NITROGENIO + FOSFORO + POTASSIO) >= 2
+        THEN 'IDEAL'
+        ELSE 'AJUSTE_NECESSARIO'
+    END as STATUS_CULTIVO
+FROM SENSORES_SOJA_RM567951
+ORDER BY TIMESTAMP;
+
+-- ========================================
+-- 8. EFICIÊNCIA DO SISTEMA DE IRRIGAÇÃO
+-- ========================================
+SELECT 
+    ROUND(AVG(CASE WHEN IRRIGACAO_ATIVA = 1 THEN UMIDADE_SOLO END), 2) as UMIDADE_QUANDO_IRRIGA,
+    ROUND(AVG(CASE WHEN IRRIGACAO_ATIVA = 0 THEN UMIDADE_SOLO END), 2) as UMIDADE_QUANDO_NAO_IRRIGA,
+    COUNT(CASE WHEN IRRIGACAO_ATIVA = 1 AND UMIDADE_SOLO < 60 THEN 1 END) as IRRIGACOES_NECESSARIAS,
+    COUNT(CASE WHEN IRRIGACAO_ATIVA = 0 AND UMIDADE_SOLO < 60 THEN 1 END) as IRRIGACOES_PERDIDAS
+FROM SENSORES_SOJA_RM567951;
+
+-- ========================================
+-- 9. TENDÊNCIA DE UMIDADE AO LONGO DO DIA
+-- ========================================
+SELECT 
+    EXTRACT(HOUR FROM TIMESTAMP) as HORA,
+    ROUND(AVG(UMIDADE_SOLO), 2) as UMIDADE_MEDIA,
+    ROUND(AVG(TEMPERATURA), 2) as TEMP_MEDIA,
+    SUM(IRRIGACAO_ATIVA) as IRRIGACOES,
+    SUM(CHUVA_MM) as CHUVA_TOTAL
+FROM SENSORES_SOJA_RM567951
+GROUP BY EXTRACT(HOUR FROM TIMESTAMP)
+ORDER BY HORA;
+
+-- ========================================
+-- 10. RELATÓRIO FINAL - RESUMO EXECUTIVO
+-- ========================================
+SELECT 
+    'RESUMO EXECUTIVO - SISTEMA IRRIGAÇÃO SOJA' as RELATORIO,
+    COUNT(*) as TOTAL_MEDICOES,
+    ROUND((SUM(IRRIGACAO_ATIVA) * 100.0 / COUNT(*)), 1) as PERCENTUAL_IRRIGACAO,
+    ROUND(AVG(UMIDADE_SOLO), 1) as UMIDADE_MEDIA_GERAL,
+    ROUND(AVG(PH_SOLO), 1) as PH_MEDIO_GERAL,
+    ROUND(SUM(CHUVA_MM), 1) as PRECIPITACAO_TOTAL,
+    COUNT(CASE WHEN PH_SOLO BETWEEN 6.0 AND 6.8 THEN 1 END) as MEDICOES_PH_IDEAL
+FROM SENSORES_SOJA_RM567951;

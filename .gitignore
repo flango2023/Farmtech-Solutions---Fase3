@@ -1,0 +1,49 @@
+# FarmTech Solutions - Fase 3
+# Arquivos a serem ignorados no Git
+
+# Credenciais e configurações sensíveis
+*.env
+config/credentials.json
+database/connection_strings.txt
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.log
+*.cache
+
+# Screenshots com informações sensíveis
+screenshots/*_credentials.png
+screenshots/*_password.png
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Diretórios de backup
+backup/
+temp/
+
+# Arquivos Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-*
+
+# Logs do Oracle
+*.trc
+*.aud
